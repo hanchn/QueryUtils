@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <link rel="stylesheet" href="css.css" />
+  </head>
+  <body>
+    <div class="test">123123123</div>
+  </body>
+</html>
+<script src="QueryUtils.js"></script>
+<script>
+  let { $ } = new QueryUtils();
+  let test = $(".test");
+  test.css({
+    color: "#FFF",
+    background: "blue",
+    "font-size": "100px"
+  });
+  test
+    .bind("click", () => {
+      alert(1);
+    })
+    .hide();
+</script>
