@@ -1,6 +1,6 @@
 ## QueryUtils
 
-十分钟写一个阉割版的 JQuery
+封装的一个类似于JQuery的模块，极小 压缩后3k 不到，集成了常用的DOM操作功能
 
 ### 功能 list
 
