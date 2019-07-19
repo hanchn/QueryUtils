@@ -1,19 +1,40 @@
 // 阉割版的JQuery
 class QueryUtils {
   state = {};
-  constructor() {
-    super();
-  }
+  constructor() {}
 
   // 绑定dom
   $ = (target = null) => {
     if (target == null) return;
-    let { fade, getAttr, getStyle, bind, css, addClass, html, text } = this;
+    let {
+      getAttr,
+      getStyle,
+      bind,
+      css,
+      addClass,
+      html,
+      text,
+      removeAll
+    } = this;
 
     let root = document.querySelector(target);
     let style = getStyle({ root });
-    root.show = (time = 0) => fade({ style, root, time });
-    root.hide = (time = 0) => fade({ style, root, time, show: false });
+    root.show = (time = 0) => {
+      let styles = { opacity: "1", time, wait: 0 };
+      css({
+        root,
+        styles,
+        style
+      });
+    };
+    root.hide = (time = 0) => {
+      let styles = { opacity: "0", time, wait: 0 };
+      css({
+        root,
+        styles,
+        style
+      });
+    };
     root.width = getAttr({ attr: "width", root });
     root.height = getAttr({ attr: "height", root });
     root.top = getAttr({ attr: "top", root });
@@ -21,19 +42,30 @@ class QueryUtils {
     root.down = getAttr({ attr: "down", root });
     root.left = getAttr({ attr: "left", root });
     root.bind = (event, res) => bind({ root, eType: event, res });
-    root.bindClear = (event, res) => bind({ root, eType: event });
+    root.removeBind = (event, res) =>
+      bind({ remove: true, root, eType: event, res });
     root.addClass = className => addClass({ root, className });
-    root.html = template => () =>
+    root.removeClass = className => addClass({ root, className, add: false });
+    root.removeChild = targets => removeAll(targets);
+
+    root.html = template =>
       html({
         root,
         template
       });
-    root.text = template => () =>
+    root.text = template =>
       text({
         root,
         template
       });
     root.css = styles =>
+      css({
+        root,
+        styles,
+        style
+      });
+
+    root.animate = (styles = { time: 0, wait: 0, ease: "linear" }) =>
       css({
         root,
         styles,
@@ -49,23 +81,33 @@ class QueryUtils {
     return style == null ? "" : style;
   };
 
-  // 显示隐藏DOM
-  fade = ({ style = null, root = null, show = true, time }) => {
-    let setTimer = setTimeout(() => {
-      if (style == null || root == null) return;
-      root.style = style + `display: ${show ? "block" : "none"};`;
-      clearTimeout(setTimer);
-      return root;
-    });
+  // 添加class
+  addClass = ({ root, className, add = true }) => {
+    let oldClassName = root.getAttribute("class");
+    if (add) {
+      root.setAttribute(
+        "class",
+        (oldClassName ? oldClassName + " " : "") + className
+      );
+    } else {
+      root.setAttribute(
+        "class",
+        oldClassName
+          .split(" ")
+          .filter(v => v !== className)
+          .join(" ")
+      );
+    }
+
+    return root;
   };
 
-  addClass = ({ root, className }) => {
-    let oldClassName = root.getAttribute("class");
-    root.setAttribute(
-      "class",
-      (oldClassName ? oldClassName + " " : "") + className
-    );
-    return root;
+  // 移除
+  removeAll = target => {
+    let getTargets = document.querySelectorAll(target);
+    for (let i = 0; i < getTargets.length; i++) {
+      getTargets[i].remove();
+    }
   };
 
   // 获取DOM的宽高
@@ -79,9 +121,9 @@ class QueryUtils {
       case "top":
         return root.offsetTop;
       case "right":
-        return root.offsetRight;
+        return window.innerWidth - root.offsetLeft - root.width;
       case "down":
-        return root.offsetDown;
+        return window.innerHeight - root.offsetTop - root.height;
       case "left":
         return root.offsetLeft;
       default:
@@ -93,22 +135,51 @@ class QueryUtils {
   css = ({ root, styles, style }) => {
     let styleSnippets = style;
     if (!styles) return;
-    Object.keys(styles).map(v => {
-      styleSnippets += `${v}: ${styles[v]};`;
-    });
-    root.style = styleSnippets;
+    if (styles.time > 0) {
+      const { ease = "linear", time = 0, wait = 0 } = styles;
+      root.style =
+        styleSnippets +
+        `transition: all ${time / 1000}s ${ease} ${wait / 1000}s;`;
+      setTimeout(() => {
+        Object.keys(styles).map(v => {
+          if (
+            v !== "ease" &&
+            v !== "time" &&
+            v !== "wait" &&
+            !(v == "display" && (styles[v] == "block" || styles[v] == "none"))
+          ) {
+            styleSnippets += `${v}: ${styles[v]};`;
+          }
+        });
+        root.style =
+          styleSnippets +
+          `transition: all ${time / 1000}s ${ease} ${wait / 1000}s;` +
+          styleSnippets;
+        setTimeout(() => {
+          root.style =
+            styleSnippets +
+            `transition: all ${time / 1000}s ${ease} ${wait / 1000}s;` +
+            styleSnippets +
+            `display: ${styles["display"]};`;
+        }, time - 1);
+      }, 0);
+    } else {
+      Object.keys(styles).map(v => {
+        styleSnippets += `${v}: ${styles[v]};`;
+      });
+      root.style = styleSnippets;
+    }
     return root;
   };
 
   // 事件绑定
-  bind = ({ root = window, eType = "click", res }) => {
-    root.addEventListener(eType, res);
-    return root;
-  };
+  bind = ({ remove = false, root = window, eType = "click", res }) => {
+    if (remove) {
+      root.removeEventListener(eType, res, false);
+    } else {
+      root.addEventListener(eType, res, false);
+    }
 
-  // 事件清除
-  bindClear = ({ root = window, eType = "click" }) => {
-    root.removeEventListener(eType);
     return root;
   };
 
@@ -116,8 +187,14 @@ class QueryUtils {
   getWindowState = () => ({
     width: window.innerWidth,
     height: window.innerHeight,
-    scrollTop: window.screenTop,
-    scrollLeft: window.scrollLeft
+    scrollTop:
+      document.documentElement.scrollTop ||
+      window.pageYOffset ||
+      document.body.scrollTop,
+    scrollLeft:
+      document.documentElement.scrollLeft ||
+      window.pageXOffset ||
+      document.body.scrollLeft
   });
 
   // 创建DOM
@@ -165,5 +242,3 @@ class QueryUtils {
   // 响应式window
   resize = ({ res = () => {} }) => window.addEventListener("resize", res);
 }
-
-export default QueryUtils;

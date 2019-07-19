@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>animate</title>
+    <script src="../QueryUtils.js"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+<script>
+  let { css, $ } = new QueryUtils();
+  $("#root").animate({
+    width: "100px",
+    height: "100px",
+    background: "red",
+    ease: "linear",
+    time: 1000,
+    wait: 1000
+  });
+</script>
