@@ -1,12 +1,14 @@
 // 阉割版的JQuery
 class QueryUtils {
   state = {};
-  constructor() {}
+  constructor() {
+    super();
+  }
 
   // 绑定dom
   $ = (target = null) => {
     if (target == null) return;
-    let { fade, getAttr, getStyle, bind, css } = this;
+    let { fade, getAttr, getStyle, bind, css, addClass, html, text } = this;
 
     let root = document.querySelector(target);
     let style = getStyle({ root });
@@ -20,6 +22,17 @@ class QueryUtils {
     root.left = getAttr({ attr: "left", root });
     root.bind = (event, res) => bind({ root, eType: event, res });
     root.bindClear = (event, res) => bind({ root, eType: event });
+    root.addClass = className => addClass({ root, className });
+    root.html = template => () =>
+      html({
+        root,
+        template
+      });
+    root.text = template => () =>
+      text({
+        root,
+        template
+      });
     root.css = styles =>
       css({
         root,
@@ -46,6 +59,15 @@ class QueryUtils {
     });
   };
 
+  addClass = ({ root, className }) => {
+    let oldClassName = root.getAttribute("class");
+    root.setAttribute(
+      "class",
+      (oldClassName ? oldClassName + " " : "") + className
+    );
+    return root;
+  };
+
   // 获取DOM的宽高
   getAttr = ({ attr = null, root }) => {
     if (attr == null) return;
@@ -70,6 +92,7 @@ class QueryUtils {
   // css
   css = ({ root, styles, style }) => {
     let styleSnippets = style;
+    if (!styles) return;
     Object.keys(styles).map(v => {
       styleSnippets += `${v}: ${styles[v]};`;
     });
@@ -97,6 +120,50 @@ class QueryUtils {
     scrollLeft: window.scrollLeft
   });
 
+  // 创建DOM
+  createEl = ({ attr = {}, root = null, length = 1 }) => {
+    let rootDom = document.querySelector(root == null ? "body" : root);
+    let empList = [];
+    for (let i = 0; i < length; i++) {
+      const createDom = document.createElement("div");
+      empList = [...empList, createDom];
+      if (attr !== {}) {
+        Object.keys(attr).map(v => {
+          if (v == "style") {
+            let { css } = this;
+            css({ root: createDom, styles: attr[v], style: "" });
+          } else if (v == "html") {
+            let { html } = this;
+            html({ root: createDom, template: attr[v] });
+          } else if (v == "text") {
+            let { text } = this;
+            html({ root: createDom, template: attr[v] });
+          } else {
+            createDom.setAttribute(v, attr[v]);
+          }
+        });
+      }
+      rootDom.appendChild(createDom);
+    }
+    if (length == 1) {
+      return empList[0];
+    } else {
+      return empList;
+    }
+  };
+
+  html = ({ root, template }) => {
+    root.innerHTML = template;
+    return root;
+  };
+
+  text = ({ root, template }) => {
+    root.innerText = template;
+    return root;
+  };
+
   // 响应式window
   resize = ({ res = () => {} }) => window.addEventListener("resize", res);
 }
+
+export default QueryUtils;
