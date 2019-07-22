@@ -1,6 +1,6 @@
 ## QueryUtils
 
-封装的一个类似于JQuery的模块，极小 压缩后3k 不到，集成了常用的DOM操作功能
+封装的一个类似于 JQuery 的模块，极小 压缩后 3k 不到，集成了常用的 DOM 操作功能
 
 ### 功能 list
 
@@ -25,4 +25,7 @@
 15. show 显示方法
 16. hide 隐藏方法
 17. resize 监控窗口响应
+18. keyframe 单动画
+19. keyframes 链式多动画
+20. frameAnimation 帧率动画
 ```

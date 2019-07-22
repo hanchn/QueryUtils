@@ -4,13 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>addClass</title>
+    <title>frameAnimation</title>
     <script src="../QueryUtils.js"></script>
     <style>
       #root {
-        width: 200px;
+        width: 266.66px;
         height: 200px;
-        background: red;
+        background: url("runner.png") no-repeat;
+        background-position-x: 0px;
+        margin: 200px auto;
       }
     </style>
   </head>
@@ -21,5 +23,17 @@
 </html>
 <script>
   let { $ } = new QueryUtils();
-  $("#root").addClass("testMe");
+  $("#root").keyframes({
+    animation: {
+      duration: 2,
+      timingFun: "steps(24)",
+      count: "infinite",
+      mode: "forwards"
+    },
+    keyframe: {
+      "100%": {
+        "background-position-x": "-6400px"
+      }
+    }
+  });
 </script>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>addClass</title>
+    <title>append</title>
     <script src="../QueryUtils.js"></script>
     <style>
       #root {
@@ -21,5 +21,11 @@
 </html>
 <script>
   let { $ } = new QueryUtils();
-  $("#root").addClass("testMe");
+  $("#root").append({
+    type: "div",
+    attr: {
+      class: "test",
+      html: "Hello Wolrd !"
+    }
+  });
 </script>

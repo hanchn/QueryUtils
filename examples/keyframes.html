@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>width</title>
+    <script src="../QueryUtils.js"></script>
+    <style>
+      #root {
+        width: 50px;
+        height: 50px;
+        background: red;
+        top: 200px;
+        left: 100px;
+        position: fixed;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+<script>
+  let { $ } = new QueryUtils();
+  $("#root").keyframes([
+    {
+      animation: {
+        duration: 2
+      },
+      keyframe: {
+        "100%": {
+          transform: "translateX(300px)",
+          background: "#000"
+        }
+      }
+    },
+    {
+      animation: {
+        duration: 2
+      },
+      keyframe: {
+        "100%": {
+          width: "300px",
+          transform: "rotate3d(1, 1, 1, 45deg)"
+        }
+      }
+    }
+  ]);
+</script>
